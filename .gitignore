@@ -1,0 +1,33 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+### Windows ###
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+### Linux ###
+*~
+
+# Maven
+log/
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+
+
+#Gradle
+.gradle
+build
+gen
