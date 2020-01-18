@@ -1,0 +1,95 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.4.1'
+    id "org.jetbrains.grammarkit" version "2019.2"
+}
+
+apply plugin: 'org.jetbrains.grammarkit'
+apply plugin: 'idea'
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java.srcDirs += 'gen'
+    }
+}
+
+idea {
+    module {
+        sourceDirs += file('gen/')
+        generatedSourceDirs += file('gen/')
+    }
+}
+
+dependencies {
+    compile group: 'org.jbehave', name: 'jbehave-core', version: '3.10'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version '2019.2.4'
+    plugins 'java'
+}
+
+grammarKit {
+    jflexRelease = '1.7.0-1'
+    grammarKitRelease = '6452fde524'
+}
+
+
+import org.jetbrains.grammarkit.tasks.GenerateLexer
+import org.jetbrains.grammarkit.tasks.GenerateParser
+
+task generateCompositeStepsLexer(type: GenerateLexer) {
+    // source flex file
+    source = "src/main/resources/org/example/CompositeSteps.flex"
+
+    // target directory for lexer
+    targetDir = "gen/org/example/"
+
+    // target classname, target file will be targetDir/targetClass.java
+    targetClass = "CompositeStepsLexer"
+
+    // optional, path to the task-specific skeleton file. Default: none
+    //skeleton = '/some/specific/skeleton'
+
+    // if set, plugin will remove a lexer output file before generating new one. Default: false
+    purgeOldFiles = true
+}
+
+task generateCompositeStepsParser(type: GenerateParser) {
+    // source bnf file
+    source = "src/main/resources/org/example/CompositeSteps.bnf"
+
+    // optional, task-specific root for the generated files. Default: none
+    targetRoot = 'gen'
+
+    // path to a parser file, relative to the targetRoot
+    pathToParser = '/org/example/parser/CompositeStepsParserGenerated.java'
+
+    // path to a directory with generated psi files, relative to the targetRoot
+    pathToPsiRoot = '/org/example/composite/psi'
+
+    // if set, plugin will remove a parser output file and psi output directory before generating new ones. Default: false
+    purgeOldFiles = true
+}
+
+compileJava {
+    dependsOn generateCompositeStepsLexer
+    dependsOn generateCompositeStepsParser
+}
+
+patchPluginXml {
+    changeNotes """
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>"""
+}

@@ -1,0 +1,30 @@
+{
+  parserClass="org.example.parser.CompositeStepsParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="CompositeSteps"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.example.psi"
+  psiImplPackage="org.example.psi.impl"
+
+  elementTypeHolderClass="org.example.psi.CompositeStepsTypes"
+  elementTypeClass="org.example.psi.CompositeStepsElementType"
+  tokenTypeClass="org.example.psi.CompositeStepsTokenType"
+
+}
+
+CompositeStepFile ::= Composite*
+Composite ::= COMPOSITE_KEYWORD CompositeDefinition (NEWLINES Step)+ NEWLINES? {pin=1 recoverWhile=nextCompositeRecoverRule}
+CompositeDefinition ::= GwtKeyword CompositeDefinitionWithoutKeyword {mixin="org.example.mixins.CompositeDefinitionMixin"}
+CompositeDefinitionWithoutKeyword ::= ((WORD)? NEWLINES (WORD)|WORD)+
+Step ::= GwtaKeyword StepText ReturnValueAssignment? {pin=1 recoverWhile=nextCompositeOrGwtaRecoverRule mixin="org.example.mixins.StepMixin"}
+StepText ::= ((WORD)? NEWLINES (WORD)|WORD)+
+ReturnValueAssignment ::= NEWLINES? RETURN_VALUE_ASSIGNMENT_KEYWORD RETURN_VALUE_ASSIGNMENT_KEY
+
+GwtKeyword ::= GWT_KEYWORDS_TOKEN
+GwtaKeyword ::= GWTA_KEYWORDS_TOKEN 
+
+//Recover means to skip all tokens until another composite keyword is found
+private nextCompositeRecoverRule ::= !(COMPOSITE_KEYWORD)
+private nextCompositeOrGwtaRecoverRule ::= !(NEWLINES COMPOSITE_KEYWORD|NEWLINES GWTA_KEYWORDS_TOKEN|NEWLINES)
